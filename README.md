@@ -42,7 +42,8 @@ This repository, named `Concurrency`, primarily offers a scheduler for concurren
 
 ## Usage Example
 
-The following is a simple example demonstrating how to use the Scheduler.
+### 1. `Scheduler`
+The following is a simple example demonstrating how to use the `Scheduler`.
 
 ```cpp
 #include <iostream>
@@ -97,8 +98,7 @@ int main() {
     return 0;
 }
 ```
-
-### Code Explanation
+#### Code Explanation
 
 1.  **MyWorker Class**: Implements the IScheduledWorker interface, defining the specific behavior of the work item. The RunOnce method defines the execution logic of the work item, the GetWorkerName method returns the name of the work item, and the NotifyDurationTimeout method handles timeout notifications.
     
@@ -115,9 +115,78 @@ int main() {
     *   The main thread sleeps for 5 seconds to observe the execution of the work item.
         
     *   Calls the scheduler.Deactivate method to deactivate the scheduler and stop executing the work item.
-        
-
+	
 Through this example, you can see how to use the Scheduler, CyclicalWorker, and Thread classes to implement a simple concurrent scheduling system.
+        
+### 2. `ConcurrencyLog`
+
+
+```cpp
+#include <iostream>
+#include <Concurrency/ConcurrencyLog.hpp>
+
+// Implement a simple ILogSinker class
+class ConsoleLogSinker : public Concurrency::ILogSinker {
+public:
+    void Log(const Concurrency::LogLevel level, const std::string& message) override {
+        switch (level) {
+            case Concurrency::LogLevel::Trace:
+                std::cout << "[Trace] ";
+                break;
+            case Concurrency::LogLevel::Debug:
+                std::cout << "[Debug] ";
+                break;
+            case Concurrency::LogLevel::Info:
+                std::cout << "[Info] ";
+                break;
+            case Concurrency::LogLevel::Warning:
+                std::cout << "[Warning] ";
+                break;
+            case Concurrency::LogLevel::Error:
+                std::cout << "[Error] ";
+                break;
+        }
+        std::cout << message << std::endl;
+    }
+};
+
+int main() {
+    // Get the singleton instance of ConcurrencyLog
+    Concurrency::ConcurrencyLog& logger = Concurrency::ConcurrencyLog::GetInstance();
+
+    // Create a log sink instance
+    ConsoleLogSinker sinker;
+
+    // Register the log sink
+    logger.RegisterSinker(&sinker);
+
+    // Log messages at different levels
+    logger.Log(Concurrency::LogLevel::Trace, "This is a trace message.");
+    logger.Log(Concurrency::LogLevel::Debug, "This is a debug message.");
+    logger.Log(Concurrency::LogLevel::Info, "This is an info message.");
+    logger.Log(Concurrency::LogLevel::Warning, "This is a warning message.");
+    logger.Log(Concurrency::LogLevel::Error, "This is an error message.");
+
+    return 0;
+}
+```
+#### Code Explanation
+
+1. `ConsoleLogSinker` Class
+
+    *   Implements the Concurrency::ILogSinker interface.
+	
+    *   The Log method adds a prefix based on the log level and outputs the log message to the console.
+
+2. main Function
+
+    *   Getting the Logger Instance: Obtains the singleton instance of ConcurrencyLog using Concurrency::ConcurrencyLog::GetInstance().
+	
+    *   Creating a Log Sink: Creates an instance of ConsoleLogSinker.
+	
+    *   Registering the Log Sink: Registers the ConsoleLogSinker with the ConcurrencyLog instance using RegisterSinker.
+	
+    *   Logging Messages: Logs messages at different levels using the Log method of the ConcurrencyLog instance.
 
 ## Summary
 
